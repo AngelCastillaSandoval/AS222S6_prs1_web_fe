@@ -1,35 +1,20 @@
-# .github/workflows/sonarcloud-angular.yml
-name: 🔍 SonarCloud Angular Analysis
-
+name: Build
 on:
   push:
-    branches: [frontend]
+    branches:
+      - frontend
   pull_request:
-    branches: [frontend]
-
+    types: [opened, synchronize, reopened]
 jobs:
   sonarcloud:
-    name: Analyze Angular Code
+    name: SonarQube Cloud
     runs-on: ubuntu-latest
-
     steps:
-      - name: 🔄 Checkout repository
-        uses: actions/checkout@v4
-
-      - name: ⚙️ Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
         with:
-          node-version: 20
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: 🧪 Build Angular project
-        run: npm run build --if-present
-
-      - name: 🔍 SonarCloud scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: .
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
