@@ -1,20 +1,44 @@
-name: Build
+name: 🚀 Frontend Build & SonarCloud
+
 on:
   push:
-    branches:
-      - frontend
+    branches: [ frontend ]
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [ frontend ]
+
 jobs:
-  sonarcloud:
-    name: SonarQube Cloud
+  build-and-analyze:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      # 🔄 1. Clonar repositorio
+      - name: 🔄 Checkout del repositorio
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Cloud Scan
+          fetch-depth: 0  # Importante para SonarCloud (historial completo)
+
+      # ⚙️ 2. Instalar Node.js y habilitar caché de npm
+      - name: ⚙️ Instalar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 📦 3. Instalar dependencias
+      - name: 📦 Instalar dependencias
+        run: npm install
+
+      # 🧪 4. Compilar proyecto Angular
+      - name: 🧪 Compilar Angular
+        run: npm run build --if-present
+
+      # 🧼 5. Ejecutar Lint (ESLint o Angular)
+      - name: 🧼 Lint del proyecto
+        run: npm run lint --if-present
+
+      # 🔍 6. Análisis SonarCloud
+      - name: 🔍 Análisis con SonarCloud
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Requerido para PRs
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Agrega este secreto en GitHub
