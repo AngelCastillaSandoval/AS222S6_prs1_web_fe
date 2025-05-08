@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ frontend ]
 
+
 jobs:
   build-and-analyze:
     runs-on: ubuntu-latest
